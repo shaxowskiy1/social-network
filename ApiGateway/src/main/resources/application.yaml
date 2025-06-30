@@ -1,25 +1,19 @@
 
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    register-with-eureka: false
-    fetch-registry: false
-    service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
 spring:
-  application:
-    name: api-gateway
-  main:
-    web-application-type: reactive
   cloud:
     gateway:
       server:
         webflux:
           routes:
-            - id: auth_service
+            - id: auth-service
               uri: http://localhost:8080
               predicates:
                 - Path=/api/auth/**
+            - id: post-service
+              uri: http://localhost:8081
+              predicates:
+                - Path=/post
+  main:
+    web-application-type: reactive
 server:
-  port: 8671
+  port: 8085
