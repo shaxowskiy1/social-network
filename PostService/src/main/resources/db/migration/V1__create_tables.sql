@@ -2,7 +2,7 @@ CREATE TABLE posts (
                        id UUID PRIMARY KEY,
                        user_id UUID NOT NULL,
                        content TEXT,
-                       file_id VARCHAR(255),
+                       file_id VARCHAR(255) default null,
                        created_at TIMESTAMP
 );
 

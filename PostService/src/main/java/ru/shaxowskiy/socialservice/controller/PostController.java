@@ -9,6 +9,8 @@ import ru.shaxowskiy.socialservice.models.Post;
 import ru.shaxowskiy.socialservice.services.AuthServiceImpl;
 import ru.shaxowskiy.socialservice.services.PostService;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/post")
 public class PostController {
@@ -20,6 +22,14 @@ public class PostController {
         this.postService = postService;
     }
 
+    @GetMapping
+    public ResponseEntity<PostCreatedDTO> getPost(
+            @RequestParam("uuid") UUID uuid){
+        PostCreatedDTO postFromDB = postService.getPost(uuid);
+        return ResponseEntity.ok(postFromDB);
+    }
+
+
     @PostMapping
     public ResponseEntity<PostCreatedDTO> createPost(
             @RequestBody PostCreateDTO postCreateDTO,
@@ -27,7 +37,8 @@ public class PostController {
         //TODO прочитать токен из cookie и внести в парам
         JwtRequest.ValidateTokenResponse validateTokenResponse = authService.validateTokenResponse(jwtToken);
         String username = validateTokenResponse.getUsername();
-        Post savedPost = postService.save(postCreateDTO, username);
-        return ResponseEntity.ok(new PostCreatedDTO(savedPost.getUsername(), savedPost.getContent(), savedPost.getCreatedAt()));
+        PostCreatedDTO savedPost = postService.save(postCreateDTO, username);
+        return ResponseEntity.ok(savedPost);
     }
+
 }
