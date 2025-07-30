@@ -15,19 +15,19 @@ import java.util.UUID;
 @Service
 public class PostService {
     private final PostRepository postRepository;
-    private final PostCreateMapperImpl postCreateMapper;
+    private final PostCreateMapperImpl postCreateMapperImpl;
     private final PostCreatedMapperImpl postCreatedMapperImpl;
 
 
-    public PostService(PostRepository postRepository, PostCreateMapperImpl postCreateMapper, PostCreatedMapperImpl postCreatedMapperImpl) {
+    public PostService(PostRepository postRepository, PostCreateMapperImpl postCreateMapperImpl, PostCreatedMapperImpl postCreatedMapperImpl) {
         this.postRepository = postRepository;
-        this.postCreateMapper = postCreateMapper;
+        this.postCreateMapperImpl = postCreateMapperImpl;
         this.postCreatedMapperImpl = postCreatedMapperImpl;
     }
 
     @Transactional
     public PostCreatedDTO save(PostCreateDTO postCreateDTO, String username){
-        Post post = postCreateMapper.postCreatedToPost(postCreateDTO);
+        Post post = postCreateMapperImpl.postCreatedToPost(postCreateDTO);
         post.setUsername(username);
         post.setCreatedAt(LocalDateTime.now());
         Post savingPost = postRepository.save(post);
@@ -41,5 +41,15 @@ public class PostService {
     public PostCreatedDTO getPost(UUID uuid) {
         Post postFromDB = postRepository.findPostById(uuid).orElseThrow(null);
         return postCreatedMapperImpl.postToPostCreatedDTO(postFromDB);
+    }
+
+    @Transactional
+    public PostCreatedDTO update(PostCreateDTO postCreateDTO, UUID uuid){
+        Post foundPost = postRepository.findById(uuid)
+                .orElseThrow(null);
+
+        foundPost.setContent(postCreateDTO.getContent());
+        postRepository.save(foundPost);
+        return postCreatedMapperImpl.postToPostCreatedDTO(foundPost);
     }
 }

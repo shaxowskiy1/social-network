@@ -2,10 +2,8 @@ package ru.shaxowskiy.socialservice.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.shaxowskiy.cloudfilestorage.JwtRequest;
 import ru.shaxowskiy.socialservice.dto.PostCreateDTO;
 import ru.shaxowskiy.socialservice.dto.PostCreatedDTO;
-import ru.shaxowskiy.socialservice.models.Post;
 import ru.shaxowskiy.socialservice.services.AuthServiceImpl;
 import ru.shaxowskiy.socialservice.services.PostService;
 
@@ -33,12 +31,20 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostCreatedDTO> createPost(
             @RequestBody PostCreateDTO postCreateDTO,
-            @RequestHeader(name = "Authorization") String jwtToken){
+            @RequestHeader(name = "X-User-Name") String username){
         //TODO прочитать токен из cookie и внести в парам
-        JwtRequest.ValidateTokenResponse validateTokenResponse = authService.validateTokenResponse(jwtToken);
-        String username = validateTokenResponse.getUsername();
+        //JwtRequest.ValidateTokenResponse validateTokenResponse = authService.validateTokenResponse(jwtToken);
+        //String username = validateTokenResponse.getUsername();
         PostCreatedDTO savedPost = postService.save(postCreateDTO, username);
         return ResponseEntity.ok(savedPost);
     }
 
+    @PatchMapping
+    public ResponseEntity<PostCreatedDTO> updatePost(
+            @RequestParam("uuid") UUID uuid,
+            @RequestBody PostCreateDTO postCreateDTO,
+            @RequestHeader(name = "X-User-Name") String username){
+        PostCreatedDTO savedPost = postService.update(postCreateDTO, uuid);
+        return ResponseEntity.ok(savedPost);
+    }
 }

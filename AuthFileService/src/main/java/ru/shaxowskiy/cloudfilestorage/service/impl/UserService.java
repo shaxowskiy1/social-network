@@ -17,10 +17,7 @@ import ru.shaxowskiy.cloudfilestorage.models.Role;
 import ru.shaxowskiy.cloudfilestorage.models.User;
 import ru.shaxowskiy.cloudfilestorage.repositories.UserRepository;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,4 +77,5 @@ public class UserService implements UserDetailsService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user: " + username));
     }
+
 }
