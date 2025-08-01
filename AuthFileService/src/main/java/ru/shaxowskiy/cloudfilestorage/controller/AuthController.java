@@ -56,8 +56,15 @@ public class AuthController {
                                                         BindingResult bindingResult) {
         log.debug("Received registration request for user: {}", user.getUsername());
 
+        validateBindingResult(bindingResult);
+
+        userService.addUser(user);
+        return new ResponseEntity<>(new AuthResponseDTO(user.getUsername()), HttpStatus.CREATED);
+    }
+
+    private static void validateBindingResult(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            log.debug("Errors of validation in process registration user");
+            log.debug("Validate a process of credential user's");
             StringBuilder sb = new StringBuilder();
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
             for (FieldError fieldError : fieldErrors) {
@@ -65,10 +72,8 @@ public class AuthController {
             }
             throw new UserNotCreatedException(sb.toString());
         }
-
-        userService.addUser(user);
-        return new ResponseEntity<>(new AuthResponseDTO(user.getUsername()), HttpStatus.OK);
     }
+
     @ExceptionHandler
     public ResponseEntity<UserErrorResponse> handleUserNotCreatedException(UserNotCreatedException e) {
         UserErrorResponse userErrorResponse = new UserErrorResponse();
@@ -78,7 +83,8 @@ public class AuthController {
 
 
     @PostMapping("/sign-in")
-    public ResponseEntity<?> loginUser(@Valid @RequestBody SignInRequestDTO requestUser, HttpServletRequest request) {
+    public ResponseEntity<?> loginUser(@Valid @RequestBody SignInRequestDTO requestUser,
+                                       HttpServletRequest request) {
         log.info("Received login request for user: {}", requestUser.getUsername());
         try {
             Authentication authenticate = authenticationManager.authenticate(
@@ -89,7 +95,6 @@ public class AuthController {
 
             HttpSession session = request.getSession(true);
             session.setAttribute("SPRING_SECURITY_CONTEXT", context);
-            //return ResponseEntity.ok(new AuthResponseDTO(requestUser.getUsername()));
             return ResponseEntity.ok(jwtUtil.generateToken(requestUser));
         } catch(AuthenticationException e){
             log.info("Failed sign in {}", e.getMessage());
@@ -97,7 +102,7 @@ public class AuthController {
         }
     }
 
-    //TODO использовать маппер
+    //TODO использовать маппер и решить проблему с JWT токеном
     @GetMapping("/user/me")
     public ResponseEntity<?> profileUser(){
         log.info("Received profile request for user");

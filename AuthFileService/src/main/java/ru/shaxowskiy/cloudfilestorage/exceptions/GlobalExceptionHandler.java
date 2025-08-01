@@ -25,4 +25,12 @@ public class GlobalExceptionHandler {
         userErrorResponse.setMessage(e.getMessage());
         return new ResponseEntity<>(userErrorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(UserNotCreatedException.class)
+    public ResponseEntity<UserErrorResponse> handleUserAlreadyExist(UserNotCreatedException e){
+        UserErrorResponse userErrorResponse = new UserErrorResponse();
+        userErrorResponse.setMessage(e.getMessage());
+        return new ResponseEntity<>(userErrorResponse, HttpStatus.BAD_REQUEST);
+    }
 }
